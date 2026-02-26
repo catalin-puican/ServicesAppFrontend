@@ -1,0 +1,9 @@
+@import "tailwindcss";
+
+@theme {
+    --font-display: "Outfit", "sans-serif";
+}
+
+* {
+    font-family: var(--font-display);
+}
