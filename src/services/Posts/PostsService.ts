@@ -171,10 +171,10 @@ export const editPost = async (post: UpdatePostRequest): Promise<GetPostsRespons
     }
 };
 
-export const queryPosts = async (query: string, page: number, pageSize: number , minPrice: number, maxPrice: number): Promise<QueryPostsResponse> => {
+export const queryPosts = async (query: string, page: number, pageSize: number , minPrice: number, maxPrice: number, categoryId?: string): Promise<QueryPostsResponse> => {
     try
     {
-        const response = await axiosInstance.get(`${BASE_URL}/query?query=${query}&page=${page}&minPrice=${minPrice}&maxPrice=${maxPrice}&pageSize=${pageSize}`);
+        const response = await axiosInstance.get(`${BASE_URL}/query?query=${query}&page=${page}&minPrice=${minPrice}&maxPrice=${maxPrice}&pageSize=${pageSize}${categoryId ? `&categoryId=${categoryId}` : ''}`);
         return queryPostsResponseSchema.parse(response.data);
     }
     catch (error)
@@ -200,10 +200,10 @@ export const queryPosts = async (query: string, page: number, pageSize: number ,
     }
 };
 
-export const queryPostsForHomepage = async (query: string, page: number, pageSize: number): Promise<QueryPostforHomepageResponse> => {
+export const queryPostsForHomepage = async (query: string, page: number, pageSize: number, categoryId?: string): Promise<QueryPostforHomepageResponse> => {
     try
     {
-        const response = await axiosInstance.get(`${BASE_URL}/query?query=${query}&page=${page}&pageSize=${pageSize}`);
+        const response = await axiosInstance.get(`${BASE_URL}/query?query=${query}&page=${page}&pageSize=${pageSize}${categoryId ? `&categoryId=${categoryId}` : ''}`);
         return queryPostsResponseSchema.parse(response.data);
     }
     catch (error)

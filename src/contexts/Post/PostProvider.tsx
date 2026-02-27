@@ -1,4 +1,4 @@
-import { useEffect, useState, type FC } from "react";
+import { useState, type FC } from "react";
 import { PostContext, type PostContextType } from "./PostContext";
 import { deletePost, queryPostsForHomepage } from "@/services/Posts/PostsService";
 import type { Post } from "@/schemas/Posts/PostSchema";
@@ -36,11 +36,11 @@ export const PostProvider: FC<PostProviderProps> = ({ children }) => {
         }
     }
 
-    const fetchPaginatedPosts = async (query: string, page: number, pageSize: number) => {
+    const fetchPaginatedPosts = async (query: string, page: number, pageSize: number, categoryId?: string) => {
         try {
             setIsLoading(true);
             setError(null);
-            const data = await queryPostsForHomepage(query, page, pageSize);
+            const data = await queryPostsForHomepage(query, page, pageSize, categoryId);
             setPosts(data.posts);
             setPageCount(data.pageCount);
             setTotalCount(data.totalCount);
@@ -75,9 +75,6 @@ export const PostProvider: FC<PostProviderProps> = ({ children }) => {
         await fetchPosts();
     };
 
-    useEffect(() => {
-        fetchPosts();
-    }, []);
 
     const value: PostContextType = {
         posts,

@@ -12,7 +12,7 @@ export type PostContextType = {
     setCurrentPost: (post: Post) => void;
     refreshPosts: () => Promise<void>;
     deletePostById: (id: string) => Promise<void>;
-    fetchPaginatedPosts: (query: string, page: number, pageSize: number) => Promise<void>;
+    fetchPaginatedPosts: (query: string, page: number, pageSize: number, categoryId?: string) => Promise<void>;
 }
 
 export const PostContext = createContext<PostContextType | null>(null);

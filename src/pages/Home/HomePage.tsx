@@ -3,21 +3,19 @@ import { PostCard } from "@/components/posts/PostCard";
 import { useUserContext } from "@/contexts/User/useUserContext";
 import { Spinner } from "@/components/ui/spinner";
 import { ServiceNavigation } from "@/components/navigation/ServiceNavigation";
-import { useEffect, useState } from "react";
-import type { Post } from "@/schemas/Posts/PostSchema";
-import { queryPostsForHomepage } from "@/services/Posts/PostsService";
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
-
 import { useSearchParams } from "react-router-dom";
+
+import { usePostContext } from "@/contexts/Post/usePostContext";
 
 export const HomePage = () => {
     const { currentUser } = useUserContext();
     const [searchParams, setSearchParams] = useSearchParams();
-    const [posts, setPosts] = useState<Post[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
+    const { posts, isLoading, error, fetchPaginatedPosts } = usePostContext();
 
     const currentPage = Number(searchParams.get("page")) || 1;
+    const categoryId = searchParams.get("category") || undefined;
 
     const handlePaginationForward = () => {
         searchParams.set("page", (currentPage + 1).toString());
@@ -33,22 +31,12 @@ export const HomePage = () => {
 
     useEffect(() => {
         const fetchPosts = async () => {
-            setIsLoading(true);
-            setError(null);
-            try {
-                const response = await queryPostsForHomepage("", currentPage, 10);
-                setPosts(response.posts);
-                window.scrollTo({ top: 0, behavior: "smooth" });
-            } catch (error) {
-                console.error("Failed to fetch posts:", error);
-                setError(error instanceof Error ? error.message : "Failed to fetch posts");
-            } finally {
-                setIsLoading(false);
-            }
+            await fetchPaginatedPosts("", currentPage, 10, categoryId);
+            window.scrollTo({ top: 0, behavior: "smooth" });
         };
 
         fetchPosts();
-    }, [currentPage]);
+    }, [currentPage, categoryId]);
 
     return (
         <div className="min-h-screen bg-gray-50">
