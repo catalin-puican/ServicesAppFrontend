@@ -2,9 +2,9 @@ import { useUserContext } from "@/contexts/User/useUserContext";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Loader2, Edit, Trash2 } from "lucide-react";
+import { Loader2, Edit, Trash2, X } from "lucide-react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { type GetPostsResponse } from "@/schemas/Posts/Responses/GetPostsResponse";
 import { getPostById, deletePost } from "@/services/Posts/PostsService";
 import { queryReviews } from "@/services/Reviews/ReviewsService";
@@ -31,6 +31,9 @@ export const PostPage = () => {
   const [reviewsTotalPages, setReviewsTotalPages] = useState(1);
   const [reviewsTotalCount, setReviewsTotalCount] = useState(0);
   const [isReviewsLoading, setIsReviewsLoading] = useState(false);
+  const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
+
+  const closeLightbox = useCallback(() => setLightboxUrl(null), []);
     const navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams();
 
@@ -277,19 +280,42 @@ const handleLeaveReview = () => {
               <div className="flex flex-col space-y-4">
                 <div className="space-y-3">
                   {reviews.map((review: ReviewResponse) => (
-                    <div key={review.id} className="p-4 rounded-lg bg-accent/30 border border-accent/50">
-                      <p className="text-sm text-muted-foreground">{review.comment}</p>
+                    <div
+                      key={review.id}
+                      className="flex flex-col items-start w-full p-4 rounded-lg bg-accent/20 border border-accent/40 border-l-4 border-l-primary/60 gap-2 shadow-sm"
+                    >
+                      {/* Rating stars */}
                       {review.rating && (
-                        <p className="text-xs text-primary mt-2 flex items-center gap-1">
-                          <span className="font-semibold">Rating:</span>
-                          <span>{review.rating}/5</span>
-                        </p>
-                      )}
-                      {review.reviewImages?.map((image: GetReviewImagesResponse) => (
-                        <div key={image.id} className="flex flex-row items-center justify-between">
-                          <img src={image.url} alt="Review Image" className="w-1/4 h-1/4 object-contain rounded-lg"/>
+                        <div className="flex items-center gap-1">
+                          {Array.from({ length: 5 }).map((_, i) => (
+                            <span
+                              key={i}
+                              className={`text-base ${i < review.rating! ? "text-yellow-400" : "text-muted-foreground/30"}`}
+                            >
+                              ★
+                            </span>
+                          ))}
+                          <span className="text-xs text-muted-foreground ml-1">{review.rating}/5</span>
                         </div>
-                      ))}
+                      )}
+
+                      {/* Comment */}
+                      <p className="text-sm text-foreground/80 leading-relaxed">{review.comment}</p>
+
+                      {/* Images */}
+                      {review.reviewImages && review.reviewImages.length > 0 && (
+                        <div className="flex flex-wrap gap-2 mt-1">
+                          {review.reviewImages.map((image: GetReviewImagesResponse, idx: number) => (
+                            <img
+                              key={idx}
+                              src={image.url}
+                              alt={`Review image ${idx + 1}`}
+                              onClick={() => setLightboxUrl(image.url)}
+                              className="h-24 w-24 object-cover rounded-lg border border-accent/50 cursor-zoom-in hover:opacity-90 hover:scale-105 transition-transform duration-200 shadow-sm"
+                            />
+                          ))}
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -329,6 +355,28 @@ const handleLeaveReview = () => {
         </CardContent>
         
       </Card>
+
+      {/* Lightbox overlay */}
+      {lightboxUrl && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm"
+          onClick={closeLightbox}
+        >
+          <button
+            onClick={closeLightbox}
+            className="absolute top-4 right-4 text-white/80 hover:text-white bg-black/40 hover:bg-black/60 rounded-full p-2 transition-colors cursor-pointer"
+            aria-label="Close image"
+          >
+            <X className="h-6 w-6" />
+          </button>
+          <img
+            src={lightboxUrl}
+            alt="Full size review image"
+            onClick={(e) => e.stopPropagation()}
+            className="max-h-[90vh] max-w-[90vw] object-contain rounded-xl shadow-2xl"
+          />
+        </div>
+      )}
     </div>
   );
 };
