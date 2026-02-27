@@ -205,7 +205,7 @@ const handleLeaveReview = () => {
         </CardHeader>
 
         <CardContent className="px-8 pb-8 space-y-8">
-          <Carousel className="w-full max-w-2xl mx-auto">
+          <Carousel opts={{ loop: true }} className="w-full max-w-2xl mx-auto">
             <CarouselContent>
               {post.postImageUrls && post.postImageUrls.length > 0 ? (
                 post.postImageUrls.map((imageUrl, index) => (
