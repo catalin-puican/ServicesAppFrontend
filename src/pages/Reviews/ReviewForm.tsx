@@ -55,15 +55,14 @@ export const ReviewForm = () => {
 
         try {
             if (data.imageFiles && data.imageFiles.length > 0) {
-                const createdReview = await createReview({
+                const review = await createReview({
                     userId: currentUser.id,
                     postId,
                     comment: data.comment,
                     rating: data.rating,
                 });
 
-                const uploadPromises = data.imageFiles.map(file => uploadReviewImage(file, createdReview.id));
-                await Promise.all(uploadPromises);
+                await Promise.all(data.imageFiles.map(file => uploadReviewImage(file, review.id)));
 
                 toast.success("Review created successfully", {
                     position: "top-center",
@@ -94,7 +93,7 @@ export const ReviewForm = () => {
     };
 
     return (
-        <Card className="p-4 border-gray-300 shadow-md" onSubmit={handleSubmit(onSubmit)}>
+        <Card className="p-4 border-gray-300 shadow-md">
             <ReviewInfoForm
                 registerField={registerField}
                 errors={errors}
@@ -104,7 +103,6 @@ export const ReviewForm = () => {
                 watch={watch}
                 isSubmitting={isSubmitting}
             />
-            <button onClick={() => console.log(watch())}>Log</button>
         </Card>
     );
 };

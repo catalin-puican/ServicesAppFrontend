@@ -16,6 +16,7 @@ import {
   CarouselNext, 
   CarouselPrevious 
 } from "@/components/ui/carousel";
+import type { GetReviewImagesResponse } from "@/schemas/ReviewImages/Responses/GetReviewImagesResponse";
 
 export const PostPage = () => {
   const { currentUser } = useUserContext();
@@ -284,6 +285,11 @@ const handleLeaveReview = () => {
                           <span>{review.rating}/5</span>
                         </p>
                       )}
+                      {review.reviewImages?.map((image: GetReviewImagesResponse) => (
+                        <div key={image.id} className="flex flex-row items-center justify-between">
+                          <img src={image.url} alt="Review Image" className="w-1/4 h-1/4 object-contain rounded-lg"/>
+                        </div>
+                      ))}
                     </div>
                   ))}
                 </div>
