@@ -88,7 +88,7 @@ export const createPost = async (post: CreatePostRequest): Promise<Post> => {
     try
     {
         const response = await axiosInstance.post(`${BASE_URL}/create`, post);
-        return postSchema.parse(response.data);
+        return getPostsResponseSchema.parse(response.data);
     }
     catch (error)
     {
