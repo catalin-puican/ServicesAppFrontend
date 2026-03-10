@@ -1,0 +1,12 @@
+services:
+  services-platform-frontend:
+    build:
+      context: .
+      dockerfile: .docker/react/Dockerfile
+    container_name: services-platform-frontend
+    volumes:
+      - ./.env:/app/.env
+    ports:
+      - "5173:80"
+      - "80:80"
+    restart: unless-stopped
